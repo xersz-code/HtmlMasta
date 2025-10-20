@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ucapan Ulang Tahun - Darrel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            touch-action: manipulation;
+        }
+        .container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .envelope-wrapper {
+            position: absolute;
+            z-index: 10;
+            perspective: 1000px;
+        }
+        .envelope {
+            width: 380px;
+            height: 240px;
+            background: #fff;
+            position: relative;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+        .envelope:hover {
+            transform: translateY(-10px) scale(1.02);
+        }
+        .flap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 120px;
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+            clip-path: polygon(0 0, 100% 0, 50% 100%);
+            transform-origin: top;
+            transition: transform 0.8s ease;
+            z-index: 3;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        .envelope.open .flap {
+            transform: rotateX(180deg);
+        }
+        .envelope-body {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 120px;
+            background: #f8f9fa;
+            border-radius: 0 0 15px 15px;
+            z-index: 1;
+        }
+        .letter {
+            position: absolute;
+            top: 30px;
+            left: 30px;
+            right: 30px;
+            bottom: 30px;
+            background: #fffaf0;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            z-index: 2;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.8s ease;
+        }
+        .letter.show {
+            display: flex;
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .letter h2 {
+            font-family: 'Dancing Script', cursive;
+            font-size: 32px;
+            color: #e74c3c;
+            margin-bottom: 15px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+        .letter p {
+            font-size: 16px;
+            color: #555;
+            margin: 10px 0;
+            line-height: 1.6;
+        }
+        .letter input {
+            width: 80%;
+            padding: 12px 15px;
+            margin: 20px 0;
+            border: 2px solid #ddd;
+            border-radius: 25px;
+            font-size: 16px;
+            text-align: center;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+        .letter input:focus {
+            border-color: #ff6b6b;
+            box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.2);
+        }
+        .letter button {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(238, 90, 82, 0.3);
+        }
+        .letter button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(238, 90, 82, 0.4);
+        }
+        .letter button:active {
+            transform: translateY(0);
+        }
+        .celebration {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, #1a1a2e, #16213e);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 100;
+            opacity: 0;
+            transition: opacity 1s ease;
+            cursor: crosshair;
+        }
+        .celebration.show {
+            display: flex;
+            opacity: 1;
+        }
+        .birthday-card {
+            background: linear-gradient(145deg, #fff, #f0f0f0);
+            padding: 40px 50px;
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            max-width: 600px;
+            transform: scale(0.8);
+            opacity: 0;
+            animation: cardPop 1s ease forwards 0.5s;
+            z-index: 10;
+        }
+        .birthday-card h1 {
+            font-family: 'Dancing Script', cursive;
+            font-size: 56px;
+            background: linear-gradient(135deg, #ff6b6b, #ffd93d, #6bcf7f);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+            text-shadow: none;
+        }
+        .birthday-card p {
+            font-size: 20px;
+            color: #444;
+            margin: 15px 0;
+            line-height: 1.7;
+        }
+        .birthday-card .emoji {
+            font-size: 36px;
+            margin: 0 5px;
+            display: inline-block;
+            animation: float 3s ease-in-out infinite;
+        }
+        .birthday-card .emoji:nth-child(2) { animation-delay: 0.5s; }
+        .birthday-card .emoji:nth-child(3) { animation-delay: 1s; }
+        .birthday-card .emoji:nth-child(4) { animation-delay: 1.5s; }
+        .cake {
+            font-size: 60px;
+            margin: 20px 0;
+            animation: bounce 2s ease-in-out infinite;
+        }
+        .confetti {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border-radius: 50% 0;
+            animation: confetti-fall linear infinite;
+        }
+        .confetti:nth-child(odd) {
+            border-radius: 0 50%;
+        }
+        @keyframes cardPop {
+            0% { transform: scale(0.8); opacity: 0; }
+            70% { transform: scale(1.05); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .stars {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+        .star {
+            position: absolute;
+            background: #fff;
+            border-radius: 50%;
+            animation: twinkle 3s ease-in-out infinite alternate;
+        }
+        @keyframes twinkle {
+            0% { opacity: 0.3; transform: scale(0.5); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        .firework {
+            position: absolute;
+            pointer-events: none;
+            opacity: 0;
+            width: 6px;
+            height: 6px;
+            transform: translate(-50%, -50%);
+        }
+        .firework.explode {
+            opacity: 1;
+            animation: firework-burst 1.5s ease-out forwards;
+        }
+        @keyframes firework-burst {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+            70% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.8; }
+            100% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+        }
+        .spark {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: #fff;
+            border-radius: 50%;
+            transform-origin: 0 0;
+        }
+
+        /* Musik Control */
+        .music-control {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.2);
+            padding: 12px 16px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 22px;
+            backdrop-filter: blur(10px);
+            z-index: 200;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .music-control:hover { transform: scale(1.1); }
+        .music-control.muted::before { content: '🔇'; }
+        .music-control::before { content: '🔊'; }
+
+        /* Responsif */
+        @media (max-width: 768px) {
+            .envelope { 
+                width: 90vw; 
+                height: 56vw; 
+                max-width: 380px; 
+                max-height: 240px;
+            }
+            .birthday-card { 
+                padding: 30px 25px; 
+                max-width: 90%;
+            }
+            .birthday-card h1 { font-size: 42px; }
+            .letter input, .letter button { width: 90%; font-size: 15px; }
+            .letter h2 { font-size: 28px; }
+            .music-control { bottom: 15px; right: 15px; font-size: 20px; padding: 10px 14px; }
+        }
+        @media (max-width: 480px) {
+            .birthday-card h1 { font-size: 36px; }
+            .birthday-card p { font-size: 18px; }
+            .cake { font-size: 50px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="envelope-wrapper">
+            <div class="envelope" id="envelope">
+                <div class="flap"></div>
+                <div class="envelope-body"></div>
+                <div class="letter" id="letter">
+                    <h2>Pesan Rahasia</h2>
+                    <p>Masukkan nama penerima untuk membuka pesan istimewa ini:</p>
+                    <input type="text" id="nameInput" placeholder="Siapa namamu?">
+                    <button onclick="checkName()">Buka Amplop</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="celebration" id="celebration">
+            <div class="stars" id="stars"></div>
+            <div class="birthday-card">
+                <h1>Selamat Ulang Tahun, Darrel!</h1>
+                <p class="cake">🎂</p>
+                <p>Semoga lu panjang umur, jadian sama Aura, makin cakep, dll. (males nulis kacuk)</p>
+                <p>Semoga lu selalu diberi ksehatan, kesuksesan, dan cinta setiap waktunya.</p>
+                <p>Dari Shaheen raja teling 969 yang selalu mendukungmu:</p>
+                <p><span class="emoji">🎈</span><span class="emoji">🎉</span><span class="emoji">🎊</span><span class="emoji">🎁</span></p>
+            </div>
+            <div class="music-control" id="musicControl" onclick="toggleMusic()"></div>
+        </div>
+    </div>
+
+    <!-- Musik Latar: Lover is a Day by Cuco -->
+    <audio id="birthdaySong" loop>
+        <source src="Lover Is a Day.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+
+    <script>
+        const envelope = document.getElementById('envelope');
+        const letter = document.getElementById('letter');
+        const celebration = document.getElementById('celebration');
+        const envelopeWrapper = document.querySelector('.envelope-wrapper');
+        const starsContainer = document.getElementById('stars');
+        const song = document.getElementById('birthdaySong');
+        const musicControl = document.getElementById('musicControl');
+        let isMuted = false;
+        let hasInteracted = false;
+
+        // Pastikan musik mulai setelah interaksi (agar tidak diblokir)
+        function tryPlayMusic() {
+            if (!hasInteracted) return;
+            song.play().catch(() => {});
+        }
+
+        // Tangkap interaksi pertama
+        ['click', 'touchstart'].forEach(event => {
+            document.body.addEventListener(event, () => {
+                hasInteracted = true;
+                tryPlayMusic();
+            }, { once: true });
+        });
+
+        // Toggle musik
+        function toggleMusic() {
+            if (isMuted) {
+                song.play();
+                musicControl.classList.remove('muted');
+                isMuted = false;
+            } else {
+                song.pause();
+                musicControl.classList.add('muted');
+                isMuted = true;
+            }
+        }
+
+        // Buka amplop
+        envelope.addEventListener('click', () => {
+            envelope.classList.add('open');
+            setTimeout(() => {
+                letter.classList.add('show');
+            }, 800);
+        });
+
+        // Cek nama
+        function checkName() {
+            const input = document.getElementById('nameInput').value.trim();
+            const validNames = ['Darrel', 'Darel', 'darrel', 'darel'];
+            const displayName = input.charAt(0).toUpperCase() + input.slice(1).toLowerCase();
+
+            if (validNames.map(n => n.toLowerCase()).includes(input.toLowerCase())) {
+                // Update nama
+                document.querySelector('.birthday-card h1').innerHTML = 
+                    `Selamat Ulang Tahun, <span style="color:#ff6b6b;">${displayName}</span>!`;
+
+                const personalMsg = document.createElement('p');
+                personalMsg.innerHTML = `Kamu luar biasa, ${displayName}! Semoga semua mimpi jadi nyata! 🌟`;
+                personalMsg.style.fontWeight = '600';
+                personalMsg.style.color = '#e74c3c';
+                document.querySelector('.birthday-card').insertBefore(personalMsg, document.querySelector('.cake'));
+
+                // Animasi keluar amplop
+                envelopeWrapper.style.transition = 'all 1s ease';
+                envelopeWrapper.style.transform = 'scale(0.5) translateY(-100px)';
+                envelopeWrapper.style.opacity = '0';
+
+                setTimeout(() => {
+                    envelopeWrapper.style.display = 'none';
+                    celebration.classList.add('show');
+                    createStars();
+                    createConfetti();
+                    setInterval(createFirework, 2500);
+                    createFirework();
+                    tryPlayMusic(); // Mulai musik
+                }, 1000);
+            } else {
+                alert('Nama salah! Coba lagi.');
+            }
+        }
+
+        // Bintang
+        function createStars() {
+            for (let i = 0; i < 80; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                star.style.width = Math.random() * 3 + 'px';
+                star.style.height = star.style.width;
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 3 + 's';
+                starsContainer.appendChild(star);
+            }
+        }
+
+        // Konfeti
+        function createConfetti() {
+            const colors = ['#ff6b6b', '#ffd93d', '#6bcf7f', '#4ecdc4', '#f7b731', '#ff8ff2'];
+            for (let i = 0; i < 200; i++) {
+                const confetti = document.createElement('div');
+                confetti.classList.add('confetti');
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                confetti.style.animationDelay = Math.random() * 2 + 's';
+                confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+                document.body.appendChild(confetti);
+                setTimeout(() => confetti.remove(), 5000);
+            }
+        }
+
+        // Kembang api otomatis + klik
+        function createFirework(x = null, y = null) {
+            const firework = document.createElement('div');
+            firework.classList.add('firework');
+            const posX = x || Math.random() * window.innerWidth;
+            const posY = y || Math.random() * window.innerHeight * 0.6;
+            firework.style.left = posX + 'px';
+            firework.style.top = posY + 'px';
+
+            const colors = ['#ff6b6b', '#ffd93d', '#6bcf7f', '#4ecdc4', '#f7b731'];
+            const color = colors[Math.floor(Math.random() * colors.length)];
+
+            for (let i = 0; i < 12; i++) {
+                const spark = document.createElement('div');
+                spark.classList.add('spark');
+                spark.style.backgroundColor = color;
+                spark.style.transform = `rotate(${i * 30}deg) translateX(0)`;
+                spark.style.animation = `firework-spark ${1.5 + Math.random() * 0.5}s ease-out forwards`;
+                firework.appendChild(spark);
+            }
+
+            document.body.appendChild(firework);
+            setTimeout(() => firework.classList.add('explode'), 100);
+            setTimeout(() => firework.remove(), 2000);
+        }
+
+        // Tambahkan spark animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes firework-spark {
+                0% { transform: rotate(var(--r)) translateX(0) scale(1); opacity: 1; }
+                100% { transform: rotate(var(--r)) translateX(80px) scale(0); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Klik untuk kembang api
+        celebration.addEventListener('click', (e) => {
+            if (celebration.classList.contains('show')) {
+                createFirework(e.clientX, e.clientY);
+            }
+        });
+
+        // Touch support
+        celebration.addEventListener('touchstart', (e) => {
+            if (celebration.classList.contains('show')) {
+                const touch = e.touches[0];
+                createFirework(touch.clientX, touch.clientY);
+                e.preventDefault();
+            }
+        }, { passive: false });
+    </script>
+</body>
+</html>
