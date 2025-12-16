@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Click Game</title>
+<style>
+body { font-family: Arial; text-align: center; }
+button { padding: 20px; font-size: 20px; }
+table { margin: auto; border-collapse: collapse; }
+td, th { border: 1px solid #000; padding: 6px 12px; }
+</style>
+</head>
+<body>
+
+<h2>Click Game</h2>
+
+<div id="login">
+  <input id="usn" placeholder="Enter USN">
+  <button onclick="start()">Start</button>
+</div>
+
+<div id="game" style="display:none;">
+  <p>Score: <span id="score">0</span></p>
+  <button onclick="clickGame()">CLICK</button>
+  <br><br>
+  <button onclick="submitScore()">Submit Score</button>
+</div>
+
+<h3>Leaderboard</h3>
+<table id="board">
+<tr><th>USN</th><th>Score</th></tr>
+</table>
+
+<script>
+const API = "https://yuhu.ayolahbisa13.workers.dev/"; // replace
+
+let score = 0;
+let usn = "";
+
+function start() {
+  usn = document.getElementById("usn").value.trim();
+  if (!usn) return;
+  document.getElementById("login").style.display = "none";
+  document.getElementById("game").style.display = "block";
+}
+
+function clickGame() {
+  score++;
+  document.getElementById("score").innerText = score;
+}
+
+async function submitScore() {
+  await fetch(API + "/submit", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ usn, score })
+  });
+  loadBoard();
+}
+
+async function loadBoard() {
+  const res = await fetch(API + "/leaderboard");
+  const data = await res.json();
+  const table = document.getElementById("board");
+  table.innerHTML = "<tr><th>USN</th><th>Score</th></tr>";
+  data.forEach(r => {
+    table.innerHTML += `<tr><td>${r.usn}</td><td>${r.score}</td></tr>`;
+  });
+}
+
+loadBoard();
+</script>
+
+</body>
+</html>
